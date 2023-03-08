@@ -35,6 +35,7 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.RenderersFactory;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider;
@@ -43,10 +44,15 @@ import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.ext.ima.ImaServerSideAdInsertionMediaSource;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.DecoderInitializationException;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil.DecoderQueryException;
+import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.metadata.id3.PrivFrame;
+import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ads.AdsLoader;
+import com.google.android.exoplayer2.source.hls.HlsManifest;
+import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -58,6 +64,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /** An activity that plays media using {@link ExoPlayer}. */
 public class PlayerActivity extends AppCompatActivity
@@ -465,6 +473,52 @@ public class PlayerActivity extends AppCompatActivity
   }
 
   private class PlayerEventListener implements Player.Listener {
+    @Override
+    public void onMetadata(Metadata meta) {
+      for (int i = 0; i < meta.length(); i++) {
+        // if (meta.get(i) instanceof TextInformationFrame) {
+        //   TextInformationFrame frame = (TextInformationFrame) meta.get(i);
+        // }
+        if (meta.get(i) instanceof PrivFrame) {
+          PrivFrame frame = (PrivFrame) meta.get(i);
+          if (frame.owner == "amperwave.metadata") {
+            try {
+              JSONObject json = new JSONObject(new String(frame.privateData));
+              android.util.Log.d("Audacy", "type: " + json.getString("type"));
+              // TODO send type to UI
+            } catch (JSONException e) {
+              // Ignore
+            }
+          }
+        }
+      }
+    }
+
+    @Override
+    public void onTimelineChanged(Timeline timeline, int reason) {
+      if (player == null) {
+        return;
+      }
+
+      Object manifest = player.getCurrentManifest();
+
+      if (!(manifest instanceof HlsManifest)) {
+        return;
+      }
+
+      HlsManifest hlsManifest = (HlsManifest) manifest;
+
+      for (int i = 0; i < hlsManifest.mediaPlaylist.segments.size(); i++) {
+        HlsMediaPlaylist.Segment segment = hlsManifest.mediaPlaylist.segments.get(i);
+        try {
+          JSONObject map = new JSONObject(segment.title);
+          android.util.Log.d("Audacy", "isLive: " + map.getString("isLive"));
+          // TODO send isLive to UI
+        } catch (JSONException e) {
+          // Ignore
+        }
+      }
+    }
 
     @Override
     public void onPlaybackStateChanged(@Player.State int playbackState) {

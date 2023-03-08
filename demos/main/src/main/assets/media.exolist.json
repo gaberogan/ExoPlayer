@@ -251,6 +251,9 @@
       {
         "name": "Apple media playlist (AAC)",
         "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear0/prog_index.m3u8"
+      }, {
+        "name": "Audacy KCBS Playback Issue",
+        "uri": "https://qa-52-5-119-208.wostreaming.net/qa-audacy-kcbsamaac-im.m3u8/?apv=a2&source=undefined&c_age=27&c_gender=M&c_home_zip=06066&c_user_id=1ac:5b7fa07f06ad4ca5b0a43ac62de96676&c_yob=1996&deviceid=gaid:77ecf20f-a208-4d57-b74e-44acb47deb83&newMeta=true&startTs=1678216325&z=ac0068922ece4db29107af90e52c12bd&p=1"
       }
     ]
   },
