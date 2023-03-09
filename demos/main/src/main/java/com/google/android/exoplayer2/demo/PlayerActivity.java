@@ -481,7 +481,7 @@ public class PlayerActivity extends AppCompatActivity
         // }
         if (meta.get(i) instanceof PrivFrame) {
           PrivFrame frame = (PrivFrame) meta.get(i);
-          if (frame.owner == "amperwave.metadata") {
+          if (frame.owner.equals("amperwave.metadata")) {
             try {
               JSONObject json = new JSONObject(new String(frame.privateData));
               android.util.Log.d("Audacy", "type: " + json.getString("type"));
