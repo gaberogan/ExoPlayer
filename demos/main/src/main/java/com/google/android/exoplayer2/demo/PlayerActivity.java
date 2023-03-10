@@ -279,7 +279,8 @@ public class PlayerActivity extends AppCompatActivity
       lastSeenTracks = Tracks.EMPTY;
       ExoPlayer.Builder playerBuilder =
           new ExoPlayer.Builder(/* context= */ this)
-              .setMediaSourceFactory(createMediaSourceFactory());
+              .setMediaSourceFactory(createMediaSourceFactory())
+              .setLoadControl(new CustomLoadControl());
       setRenderersFactory(
           playerBuilder, intent.getBooleanExtra(IntentUtil.PREFER_EXTENSION_DECODERS_EXTRA, false));
       player = playerBuilder.build();
@@ -513,6 +514,7 @@ public class PlayerActivity extends AppCompatActivity
         try {
           JSONObject map = new JSONObject(segment.title);
           android.util.Log.d("Audacy", "isLive: " + map.getString("isLive"));
+          android.util.Log.d("Audacy", "durationUs/relativeStartTimeUs/relativeDiscontinuitySequence/url: " + segment.durationUs + "/" + segment.relativeStartTimeUs + "/" + segment.relativeDiscontinuitySequence + "/" + segment.url);
           // TODO send isLive to UI
         } catch (JSONException e) {
           // Ignore
